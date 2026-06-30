@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>橹穆常相见</title>
+  <style>
+    :root {
+      --blue: #ade3ff;
+      --blue-accent: #83cfee;
+      --blue-deep: #4b7596;
+      --mist: #d6d8ea;
+      --pink: #ffccd5;
+      --pink-accent: #f4aebd;
+      --pink-soft: #ffe8ed;
+      --ink: #2d425b;
+      --muted: #728399;
+      --panel: rgba(255, 255, 255, 0.74);
+      --line: rgba(75, 117, 150, 0.16);
+      --shadow: 0 24px 70px rgba(98, 145, 178, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #ade3ff 0%, #c4ddf3 34%, #d6d8ea 51%, #ffccd5 100%);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: minmax(320px, 1.08fr) minmax(280px, 0.92fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .stage,
+    .side {
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .stage {
+      min-height: 690px;
+      padding: clamp(18px, 3vw, 32px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.58), transparent 34%),
+        repeating-linear-gradient(135deg, rgba(75, 117, 150, 0.05) 0 1px, transparent 1px 18px);
+      pointer-events: none;
+    }
+
+    .hero,
+    .wheel-zone,
+    .controls {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4.5vw, 54px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      color: var(--blue-deep);
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 510px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .counter {
+      min-width: 118px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      color: var(--ink);
+      background: linear-gradient(145deg, rgba(173, 227, 255, 0.95), rgba(255, 204, 213, 0.95));
+      box-shadow: 0 14px 34px rgba(244, 174, 189, 0.24);
+      text-align: center;
+    }
+
+    .counter span {
+      display: block;
+      font-size: 13px;
+      opacity: 0.86;
+    }
+
+    .counter strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .wheel-zone {
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+    }
+
+    .wheel-wrap {
+      width: min(76vw, 480px);
+      aspect-ratio: 1;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      filter: drop-shadow(0 28px 44px rgba(75, 117, 150, 0.20));
+      transform: rotate(var(--rotation, 0deg));
+    }
+
+    .pin {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      width: 42px;
+      height: 58px;
+      transform: translateX(-50%);
+      z-index: 3;
+      filter: drop-shadow(0 10px 12px rgba(23, 32, 63, 0.20));
+    }
+
+    .pin::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(50% 100%, 2% 0, 98% 0);
+      background: linear-gradient(180deg, #ffffff 0%, #ffccd5 46%, #ade3ff 100%);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+    }
+
+    .hub {
+      position: absolute;
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ade3ff, #ffccd5);
+      border: 8px solid rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 16px 28px rgba(23, 32, 63, 0.18);
+      z-index: 2;
+      user-select: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .result {
+      min-height: 74px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.60);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .result span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result strong {
+      margin-top: 4px;
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--blue-deep);
+      word-break: break-word;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      height: 48px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 18px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+      transform: none;
+    }
+
+    .primary {
+      min-width: 132px;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--blue), var(--pink));
+      box-shadow: 0 12px 26px rgba(75, 117, 150, 0.20);
+    }
+
+    .ghost {
+      color: var(--blue-deep);
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(75, 117, 150, 0.18);
+    }
+
+    .side {
+      border-radius: 8px;
+      padding: 22px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 18px;
+      min-height: 690px;
+    }
+
+    .side h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--blue-deep);
+    }
+
+    .prizes {
+      display: grid;
+      gap: 12px;
+    }
+
+    .prize {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .name {
+      min-width: 0;
+    }
+
+    .name strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .bar {
+      height: 8px;
+      margin-top: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(75, 117, 150, 0.10);
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: var(--fill);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--pink));
+    }
+
+    .amount {
+      min-width: 76px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-align: center;
+      color: var(--blue-deep);
+      background: #eef8ff;
+      font-weight: 800;
+    }
+
+    .history {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+    }
+
+    .history-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .history-head small {
+      color: var(--muted);
+    }
+
+    ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      overflow: auto;
+      max-height: 290px;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(173, 227, 255, 0.28), rgba(255, 204, 213, 0.28));
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    li b {
+      overflow-wrap: anywhere;
+    }
+
+    li span {
+      flex: 0 0 auto;
+      color: var(--muted);
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 18px;
+      border: 1px dashed rgba(75, 117, 150, 0.24);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.44);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .stage,
+      .side {
+        min-height: auto;
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+
+      .counter {
+        width: 100%;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .wheel-zone {
+        min-height: 350px;
+      }
+
+      .hub {
+        width: 96px;
+        height: 96px;
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stage,
+      .side {
+        padding: 16px;
+      }
+
+      .wheel-wrap {
+        width: min(88vw, 360px);
+      }
+
+      .pin {
+        width: 34px;
+        height: 48px;
+      }
+
+      button {
+        padding: 0 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="stage" aria-labelledby="title">
+      <header class="hero">
+        <div>
+          <h1 id="title">橹穆常相见</h1>
+          <p>lmp专用</p>
+        </div>
+        <div class="counter" aria-live="polite">
+          <span>剩余奖品</span>
+          <strong id="totalLeft">106</strong>
+        </div>
+      </header>
+
+      <div class="wheel-zone">
+        <div class="wheel-wrap">
+          <div class="pin" aria-hidden="true"></div>
+          <canvas id="wheel" width="960" height="960" aria-label="抽奖转盘"></canvas>
+          <div class="hub">LUCKY</div>
+        </div>
+      </div>
+
+      <footer class="controls">
+        <div class="result" aria-live="polite">
+          <span id="resultLabel">当前结果</span>
+          <strong id="resultText">准备抽奖</strong>
+        </div>
+        <div class="actions">
+          <button id="drawBtn" class="primary" type="button">开始抽奖</button>
+          <button id="resetBtn" class="ghost" type="button">重置奖池</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="side">
+      <h2>奖品库存</h2>
+      <div id="prizes" class="prizes"></div>
+      <section class="history">
+        <div class="history-head">
+          <h2>中奖记录</h2>
+          <small id="drawCount">0 次</small>
+        </div>
+        <ol id="history"></ol>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const initialPrizes = [
+      { name: "小卡", count: 50 },
+      { name: "橹穆对错扇子", count: 20 },
+      { name: "橹穆应援扇子", count: 30 },
+      { name: "爱心包挂", count: 6 }
+    ];
+
+    const colors = [
+      ["#ade3ff", "#83cfee"],
+      ["#ffe8ed", "#ffccd5"],
+      ["#c4ddf3", "#d6d8ea"],
+      ["#ffd6de", "#f4aebd"]
+    ];
+
+    const storageKey = "blue-pink-lucky-wheel-state";
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const prizesEl = document.getElementById("prizes");
+    const historyEl = document.getElementById("history");
+    const totalLeftEl = document.getElementById("totalLeft");
+    const drawCountEl = document.getElementById("drawCount");
+    const resultLabelEl = document.getElementById("resultLabel");
+    const resultTextEl = document.getElementById("resultText");
+    const drawBtn = document.getElementById("drawBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const initialTotal = initialPrizes.reduce((sum, prize) => sum + prize.count, 0);
+    const visualPortionSize = 10;
+    let state = loadState();
+    let rotation = 0;
+    let spinning = false;
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey));
+        if (saved && Array.isArray(saved.prizes) && Array.isArray(saved.history)) {
+          const compatible = saved.prizes.length === initialPrizes.length &&
+            saved.prizes.every((item, index) => item.name === initialPrizes[index].name);
+          if (compatible) {
+            return saved;
+          }
+        }
+      } catch (error) {
+        localStorage.removeItem(storageKey);
+      }
+      return {
+        prizes: initialPrizes.map((prize) => ({ ...prize })),
+        history: []
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function totalLeft() {
+      return state.prizes.reduce((sum, prize) => sum + prize.count, 0);
+    }
+
+    function buildWheelSegments() {
+      const source = totalLeft() > 0 ? state.prizes : initialPrizes;
+      const segments = source.flatMap((prize, prizeIndex) => {
+        if (prize.count <= 0) {
+          return [];
+        }
+        const portionCount = Math.max(1, Math.ceil(prize.count / visualPortionSize));
+        return Array.from({ length: portionCount }, () => ({
+          ...prize,
+          prizeIndex
+        }));
+      });
+
+      return spreadWheelSegments(
+        segments.length
+          ? segments
+          : initialPrizes.map((prize, prizeIndex) => ({ ...prize, prizeIndex }))
+      );
+    }
+
+    function spreadWheelSegments(segments) {
+      const remaining = [...segments];
+      const spread = [];
+      let previousIndex = -1;
+
+      while (remaining.length) {
+        remaining.sort((a, b) => {
+          const aCount = remaining.filter((item) => item.prizeIndex === a.prizeIndex).length;
+          const bCount = remaining.filter((item) => item.prizeIndex === b.prizeIndex).length;
+          return bCount - aCount || a.prizeIndex - b.prizeIndex;
+        });
+
+        const nextIndex = remaining.findIndex((item) => item.prizeIndex !== previousIndex);
+        const [next] = remaining.splice(nextIndex >= 0 ? nextIndex : 0, 1);
+        spread.push(next);
+        previousIndex = next.prizeIndex;
+      }
+
+      return spread;
+    }
+
+    function drawWheel() {
+      const size = canvas.width;
+      const center = size / 2;
+      const radius = center - 38;
+      ctx.clearRect(0, 0, size, size);
+
+      ctx.save();
+      ctx.translate(center, center);
+      ctx.rotate(-Math.PI / 2);
+
+      let start = 0;
+      const segments = buildWheelSegments();
+      const sliceAngle = Math.PI * 2 / segments.length;
+      segments.forEach((segment, index) => {
+        const angle = sliceAngle;
+        const end = start + angle;
+        const gradient = ctx.createRadialGradient(0, 0, radius * 0.08, 0, 0, radius);
+        gradient.addColorStop(0, "#ffffff");
+        gradient.addColorStop(0.26, colors[segment.prizeIndex % colors.length][0]);
+        gradient.addColorStop(1, colors[segment.prizeIndex % colors.length][1]);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.82)";
+        ctx.lineWidth = 9;
+        ctx.stroke();
+
+        const mid = start + angle / 2;
+        ctx.save();
+        ctx.rotate(mid);
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(23, 32, 63, 0.35)";
+        ctx.shadowBlur = 6;
+        ctx.font = "800 30px Microsoft YaHei, PingFang SC, Arial";
+        ctx.fillText(segment.name, radius - 72, -16);
+        ctx.font = "700 22px Microsoft YaHei, PingFang SC, Arial";
+        ctx.fillText(`剩 ${segment.count} 个`, radius - 72, 24);
+        ctx.restore();
+
+        start = end;
+      });
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.92)";
+      ctx.lineWidth = 18;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function render() {
+      const left = totalLeft();
+      totalLeftEl.textContent = left;
+      drawBtn.disabled = spinning || left <= 0;
+      drawBtn.textContent = spinning ? "抽奖中" : left > 0 ? "开始抽奖" : "奖池已空";
+      drawCountEl.textContent = `${state.history.length} 次`;
+
+      prizesEl.innerHTML = state.prizes.map((prize, index) => {
+        const original = initialPrizes[index].count;
+        const fill = original ? Math.max(0, prize.count / original * 100) : 0;
+        return `
+          <article class="prize">
+            <div class="name">
+              <strong>${escapeHtml(prize.name)}</strong>
+              <div class="bar" aria-hidden="true"><i style="--fill:${fill}%"></i></div>
+            </div>
+            <div class="amount">${prize.count}/${original}</div>
+          </article>
+        `;
+      }).join("");
+
+      historyEl.innerHTML = state.history.length
+        ? state.history.map((record, index) => `
+          <li>
+            <b>${escapeHtml(record.name)}</b>
+            <span>#${state.history.length - index}</span>
+          </li>
+        `).join("")
+        : `<div class="empty">暂无记录</div>`;
+
+      drawWheel();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function pickPrize() {
+      const total = totalLeft();
+      let cursor = Math.floor(Math.random() * total);
+      for (let index = 0; index < state.prizes.length; index += 1) {
+        const prize = state.prizes[index];
+        if (cursor < prize.count) {
+          return { prize, index };
+        }
+        cursor -= prize.count;
+      }
+      return null;
+    }
+
+    function segmentCenterAngle(index) {
+      const segments = buildWheelSegments();
+      const prizeSegments = segments
+        .map((segment, segmentIndex) => ({ segment, segmentIndex }))
+        .filter(({ segment }) => segment.prizeIndex === index);
+
+      if (!prizeSegments.length) {
+        return 0;
+      }
+
+      const selectedSegment = prizeSegments[Math.floor(Math.random() * prizeSegments.length)];
+      const angle = 360 / segments.length;
+      return selectedSegment.segmentIndex * angle + angle / 2;
+    }
+
+    function spinTo(index, prizeName) {
+      const centerAngle = segmentCenterAngle(index);
+      const targetPointerAngle = 0;
+      const extraTurns = 5 + Math.floor(Math.random() * 3);
+      const currentNormalized = ((rotation % 360) + 360) % 360;
+      const targetRotation = targetPointerAngle - centerAngle;
+      const delta = ((targetRotation - currentNormalized) % 360 + 360) % 360;
+      rotation += extraTurns * 360 + delta;
+      canvas.style.transition = "transform 4.2s cubic-bezier(.11,.75,.16,1)";
+      canvas.style.setProperty("--rotation", `${rotation}deg`);
+
+      window.setTimeout(() => {
+        const item = state.prizes[index];
+        item.count -= 1;
+        state.history.unshift({
+          name: prizeName,
+          time: new Date().toISOString()
+        });
+        spinning = false;
+        resultLabelEl.textContent = "抽中";
+        resultTextEl.textContent = prizeName;
+        saveState();
+        render();
+      }, 4300);
+    }
+
+    drawBtn.addEventListener("click", () => {
+      if (spinning || totalLeft() <= 0) {
+        return;
+      }
+      const selected = pickPrize();
+      if (!selected) {
+        return;
+      }
+      spinning = true;
+      resultLabelEl.textContent = "正在抽取";
+      resultTextEl.textContent = "转盘旋转中";
+      render();
+      spinTo(selected.index, selected.prize.name);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (spinning) {
+        return;
+      }
+      state = {
+        prizes: initialPrizes.map((prize) => ({ ...prize })),
+        history: []
+      };
+      rotation = 0;
+      canvas.style.transition = "none";
+      canvas.style.setProperty("--rotation", "0deg");
+      resultLabelEl.textContent = "当前结果";
+      resultTextEl.textContent = "准备抽奖";
+      saveState();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
