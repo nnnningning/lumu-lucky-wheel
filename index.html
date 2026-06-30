@@ -42,72 +42,78 @@
       padding: 28px;
     }
 
-    .decor-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .decor {
+    .page-decor {
+      display: block;
       position: absolute;
       object-fit: contain;
-      opacity: 0.9;
-      filter: drop-shadow(0 16px 20px rgba(75, 117, 150, 0.16));
+      pointer-events: none;
       user-select: none;
+      filter: drop-shadow(0 14px 18px rgba(75, 117, 150, 0.15));
     }
 
-    .decor-boy {
-      width: clamp(98px, 13vw, 176px);
-      left: clamp(12px, 4vw, 64px);
-      top: clamp(18px, 6vh, 76px);
+    .hero-art {
+      position: relative;
+      flex: 0 0 clamp(168px, 20vw, 238px);
+      height: clamp(112px, 12vw, 154px);
+      margin: -6px 2px -8px;
+    }
+
+    .hero-boy {
+      width: clamp(92px, 10vw, 132px);
+      left: 0;
+      top: 18px;
+      transform: rotate(-7deg);
+      z-index: 2;
+    }
+
+    .hero-girl {
+      width: clamp(88px, 9.5vw, 126px);
+      right: 0;
+      top: 0;
+      transform: rotate(7deg);
+      z-index: 3;
+    }
+
+    .hero-bow {
+      width: clamp(48px, 5vw, 74px);
+      left: 48%;
+      bottom: 0;
+      opacity: 0.86;
+      transform: translateX(-50%) rotate(5deg);
+      z-index: 1;
+    }
+
+    .wheel-name-stars {
+      width: clamp(50px, 5vw, 78px);
+      left: clamp(4px, 3vw, 32px);
+      top: clamp(12px, 4vw, 42px);
+      opacity: 0.86;
       transform: rotate(-8deg);
     }
 
-    .decor-girl {
-      width: clamp(94px, 12vw, 162px);
-      right: clamp(14px, 5vw, 78px);
-      top: clamp(72px, 10vh, 132px);
-      transform: rotate(8deg);
+    .wheel-sparkles {
+      width: clamp(26px, 3vw, 42px);
+      right: clamp(14px, 4vw, 58px);
+      top: 18%;
+      opacity: 0.74;
+      transform: rotate(5deg);
     }
 
-    .decor-name-stars {
-      width: clamp(50px, 5vw, 86px);
-      left: clamp(20px, 7vw, 110px);
-      bottom: clamp(110px, 18vh, 210px);
-      transform: rotate(-7deg);
-    }
-
-    .decor-bow {
-      width: clamp(78px, 7vw, 126px);
-      right: clamp(120px, 22vw, 310px);
-      bottom: clamp(34px, 8vh, 96px);
-      transform: rotate(6deg);
-    }
-
-    .decor-sparkles {
-      width: clamp(28px, 3vw, 48px);
-      left: clamp(140px, 18vw, 280px);
-      top: 42%;
-      transform: rotate(4deg);
-      opacity: 0.82;
-    }
-
-    .decor-soft-star {
-      width: clamp(46px, 5vw, 82px);
-      right: clamp(26px, 12vw, 170px);
-      top: 45%;
+    .wheel-soft-star {
+      width: clamp(44px, 5vw, 72px);
+      right: clamp(10px, 3vw, 44px);
+      bottom: 12%;
+      opacity: 0.64;
       transform: rotate(-10deg);
-      opacity: 0.72;
     }
 
-    .decor-heart-card {
-      width: clamp(54px, 6vw, 92px);
-      right: clamp(20px, 6vw, 90px);
-      bottom: clamp(120px, 20vh, 240px);
+    .side-heart-card {
+      width: clamp(58px, 6vw, 86px);
+      top: 16px;
+      right: 18px;
+      opacity: 0.68;
       transform: rotate(10deg);
-      opacity: 0.84;
+      z-index: 0;
     }
 
     .app {
@@ -126,6 +132,14 @@
       background: var(--panel);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage > :not(.page-decor),
+    .side > :not(.page-decor) {
+      position: relative;
+      z-index: 1;
     }
 
     .stage {
@@ -143,6 +157,7 @@
       content: "";
       position: absolute;
       inset: 0;
+      z-index: 0;
       background:
         linear-gradient(90deg, rgba(255, 255, 255, 0.58), transparent 34%),
         repeating-linear-gradient(135deg, rgba(75, 117, 150, 0.05) 0 1px, transparent 1px 18px);
@@ -160,7 +175,12 @@
       display: flex;
       justify-content: space-between;
       gap: 18px;
-      align-items: flex-start;
+      align-items: center;
+    }
+
+    .title-block {
+      min-width: 0;
+      flex: 1 1 auto;
     }
 
     h1 {
@@ -206,6 +226,11 @@
       display: grid;
       place-items: center;
       min-height: 420px;
+      overflow: visible;
+    }
+
+    .wheel-zone .page-decor {
+      z-index: 0;
     }
 
     .wheel-wrap {
@@ -214,6 +239,7 @@
       position: relative;
       display: grid;
       place-items: center;
+      z-index: 1;
     }
 
     canvas {
@@ -538,52 +564,6 @@
         padding: 16px;
       }
 
-      .decor {
-        opacity: 0.62;
-      }
-
-      .decor-boy {
-        width: 96px;
-        left: -18px;
-        top: 18px;
-      }
-
-      .decor-girl {
-        width: 92px;
-        right: -14px;
-        top: 96px;
-      }
-
-      .decor-name-stars {
-        width: 50px;
-        left: 10px;
-        bottom: 210px;
-      }
-
-      .decor-bow {
-        width: 74px;
-        right: 20px;
-        bottom: 58px;
-      }
-
-      .decor-sparkles {
-        width: 28px;
-        left: 18px;
-        top: 44%;
-      }
-
-      .decor-soft-star {
-        width: 48px;
-        right: 12px;
-        top: 50%;
-      }
-
-      .decor-heart-card {
-        width: 54px;
-        right: 18px;
-        bottom: 260px;
-      }
-
       .app {
         grid-template-columns: 1fr;
       }
@@ -595,6 +575,58 @@
 
       .hero {
         flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-art {
+        width: min(72vw, 250px);
+        height: 132px;
+        flex: 0 0 auto;
+        align-self: center;
+        margin: -4px auto 0;
+      }
+
+      .hero-boy {
+        width: 112px;
+        left: 20px;
+        top: 18px;
+      }
+
+      .hero-girl {
+        width: 108px;
+        right: 18px;
+      }
+
+      .hero-bow {
+        width: 58px;
+      }
+
+      .wheel-name-stars {
+        width: 50px;
+        left: -2px;
+        top: 18px;
+        opacity: 0.72;
+      }
+
+      .wheel-sparkles {
+        width: 28px;
+        right: 8px;
+        top: 20%;
+        opacity: 0.62;
+      }
+
+      .wheel-soft-star {
+        width: 50px;
+        right: 4px;
+        bottom: 8%;
+        opacity: 0.52;
+      }
+
+      .side-heart-card {
+        width: 66px;
+        top: 10px;
+        right: 12px;
+        opacity: 0.48;
       }
 
       .counter {
@@ -630,6 +662,21 @@
         padding: 16px;
       }
 
+      .hero-art {
+        width: min(78vw, 226px);
+        height: 118px;
+      }
+
+      .hero-boy {
+        width: 98px;
+        left: 16px;
+      }
+
+      .hero-girl {
+        width: 94px;
+        right: 14px;
+      }
+
       .wheel-wrap {
         width: min(88vw, 360px);
       }
@@ -646,21 +693,17 @@
   </style>
 </head>
 <body>
-  <div class="decor-layer" aria-hidden="true">
-    <img class="decor decor-boy" src="assets/decor-star-boy.png" alt="">
-    <img class="decor decor-girl" src="assets/decor-wand-girl.png" alt="">
-    <img class="decor decor-name-stars" src="assets/decor-name-stars.png" alt="">
-    <img class="decor decor-bow" src="assets/decor-bow.png" alt="">
-    <img class="decor decor-sparkles" src="assets/decor-sparkles.png" alt="">
-    <img class="decor decor-soft-star" src="assets/decor-soft-star.png" alt="">
-    <img class="decor decor-heart-card" src="assets/decor-heart-card.png" alt="">
-  </div>
   <main class="app">
     <section class="stage" aria-labelledby="title">
       <header class="hero">
-        <div>
+        <div class="title-block">
           <h1 id="title">橹穆常相见</h1>
           <p>lmp专用</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <img class="page-decor hero-boy" src="assets/decor-star-boy.png" alt="">
+          <img class="page-decor hero-girl" src="assets/decor-wand-girl.png" alt="">
+          <img class="page-decor hero-bow" src="assets/decor-bow.png" alt="">
         </div>
         <div class="counter" aria-live="polite">
           <span>剩余奖品</span>
@@ -669,6 +712,9 @@
       </header>
 
       <div class="wheel-zone">
+        <img class="page-decor wheel-name-stars" src="assets/decor-name-stars.png" alt="" aria-hidden="true">
+        <img class="page-decor wheel-sparkles" src="assets/decor-sparkles.png" alt="" aria-hidden="true">
+        <img class="page-decor wheel-soft-star" src="assets/decor-soft-star.png" alt="" aria-hidden="true">
         <div class="wheel-wrap">
           <div class="pin" aria-hidden="true"></div>
           <canvas id="wheel" width="960" height="960" aria-label="抽奖转盘"></canvas>
@@ -689,6 +735,7 @@
     </section>
 
     <aside class="side">
+      <img class="page-decor side-heart-card" src="assets/decor-heart-card.png" alt="" aria-hidden="true">
       <section class="history">
         <div class="history-head">
           <h2>中奖记录</h2>
