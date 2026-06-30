@@ -278,6 +278,31 @@
       color: var(--blue-deep);
     }
 
+    .editor-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .editor-head h2 {
+      margin: 0;
+    }
+
+    .editor-head small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+    }
+
+    .add-prize {
+      height: 42px;
+      border: 1px solid rgba(75, 117, 150, 0.18);
+      color: var(--blue-deep);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: none;
+    }
+
     .prizes {
       display: grid;
       gap: 12px;
@@ -292,6 +317,50 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.68);
+    }
+
+    .prize-edit {
+      grid-template-columns: minmax(0, 1fr) 90px 42px;
+      align-items: end;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid rgba(75, 117, 150, 0.18);
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.74);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: rgba(75, 117, 150, 0.42);
+      box-shadow: 0 0 0 3px rgba(173, 227, 255, 0.46);
+    }
+
+    .remove-prize {
+      width: 42px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid rgba(244, 174, 189, 0.52);
+      color: #9b5363;
+      background: rgba(255, 232, 237, 0.78);
+      box-shadow: none;
     }
 
     .name {
@@ -487,7 +556,13 @@
     </section>
 
     <aside class="side">
-      <h2>奖品库存</h2>
+      <div class="editor-head">
+        <div>
+          <h2>奖品设置</h2>
+          <small>修改后会自动保存到本机浏览器</small>
+        </div>
+        <button id="addPrizeBtn" class="add-prize" type="button">添加</button>
+      </div>
       <div id="prizes" class="prizes"></div>
       <section class="history">
         <div class="history-head">
@@ -501,10 +576,10 @@
 
   <script>
     const initialPrizes = [
-      { name: "小卡", count: 50 },
-      { name: "橹穆对错扇子", count: 20 },
-      { name: "橹穆应援扇子", count: 30 },
-      { name: "爱心包挂", count: 6 }
+      { id: "prize-1", name: "小卡", count: 50 },
+      { id: "prize-2", name: "橹穆对错扇子", count: 20 },
+      { id: "prize-3", name: "橹穆应援扇子", count: 30 },
+      { id: "prize-4", name: "爱心包挂", count: 6 }
     ];
 
     const colors = [
@@ -525,6 +600,7 @@
     const resultTextEl = document.getElementById("resultText");
     const drawBtn = document.getElementById("drawBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const addPrizeBtn = document.getElementById("addPrizeBtn");
 
     const initialTotal = initialPrizes.reduce((sum, prize) => sum + prize.count, 0);
     const visualPortionSize = 10;
@@ -536,11 +612,10 @@
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey));
         if (saved && Array.isArray(saved.prizes) && Array.isArray(saved.history)) {
-          const compatible = saved.prizes.length === initialPrizes.length &&
-            saved.prizes.every((item, index) => item.name === initialPrizes[index].name);
-          if (compatible) {
-            return saved;
-          }
+          return {
+            prizes: normalizePrizes(saved.prizes),
+            history: saved.history
+          };
         }
       } catch (error) {
         localStorage.removeItem(storageKey);
@@ -549,6 +624,18 @@
         prizes: initialPrizes.map((prize) => ({ ...prize })),
         history: []
       };
+    }
+
+    function normalizePrizes(prizes) {
+      return prizes.map((prize, index) => ({
+        id: prize.id || `prize-${Date.now()}-${index}`,
+        name: String(prize.name || "").trim() || "未命名奖品",
+        count: Math.max(0, Math.floor(Number(prize.count) || 0))
+      }));
+    }
+
+    function nextPrizeId() {
+      return `prize-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
     }
 
     function saveState() {
@@ -560,7 +647,7 @@
     }
 
     function buildWheelSegments() {
-      const source = totalLeft() > 0 ? state.prizes : initialPrizes;
+      const source = state.prizes;
       const segments = source.flatMap((prize, prizeIndex) => {
         if (prize.count <= 0) {
           return [];
@@ -575,7 +662,7 @@
       return spreadWheelSegments(
         segments.length
           ? segments
-          : initialPrizes.map((prize, prizeIndex) => ({ ...prize, prizeIndex }))
+          : [{ id: "empty", name: "暂无奖品", count: 0, prizeIndex: 0 }]
       );
     }
 
@@ -640,7 +727,7 @@
         ctx.shadowColor = "rgba(23, 32, 63, 0.35)";
         ctx.shadowBlur = 6;
         ctx.font = "800 30px Microsoft YaHei, PingFang SC, Arial";
-        ctx.fillText(segment.name, radius - 72, -16);
+        ctx.fillText(segment.name || "未命名奖品", radius - 72, -16);
         ctx.font = "700 22px Microsoft YaHei, PingFang SC, Arial";
         ctx.fillText(`剩 ${segment.count} 个`, radius - 72, 24);
         ctx.restore();
@@ -663,19 +750,23 @@
       drawBtn.textContent = spinning ? "抽奖中" : left > 0 ? "开始抽奖" : "奖池已空";
       drawCountEl.textContent = `${state.history.length} 次`;
 
-      prizesEl.innerHTML = state.prizes.map((prize, index) => {
-        const original = initialPrizes[index].count;
-        const fill = original ? Math.max(0, prize.count / original * 100) : 0;
-        return `
-          <article class="prize">
-            <div class="name">
-              <strong>${escapeHtml(prize.name)}</strong>
-              <div class="bar" aria-hidden="true"><i style="--fill:${fill}%"></i></div>
+      addPrizeBtn.disabled = spinning;
+
+      prizesEl.innerHTML = state.prizes.length
+        ? state.prizes.map((prize, index) => `
+          <article class="prize prize-edit" data-index="${index}">
+            <div class="field">
+              <label for="prizeName${index}">奖品名称</label>
+              <input id="prizeName${index}" data-field="name" value="${escapeHtml(prize.name)}" ${spinning ? "disabled" : ""}>
             </div>
-            <div class="amount">${prize.count}/${original}</div>
+            <div class="field">
+              <label for="prizeCount${index}">数量</label>
+              <input id="prizeCount${index}" data-field="count" type="number" min="0" step="1" value="${prize.count}" ${spinning ? "disabled" : ""}>
+            </div>
+            <button class="remove-prize" data-action="remove" type="button" aria-label="删除 ${escapeHtml(prize.name)}" ${spinning ? "disabled" : ""}>×</button>
           </article>
-        `;
-      }).join("");
+        `).join("")
+        : `<div class="empty">暂无奖品，点击“添加”创建奖品</div>`;
 
       historyEl.innerHTML = state.history.length
         ? state.history.map((record, index) => `
@@ -700,6 +791,9 @@
 
     function pickPrize() {
       const total = totalLeft();
+      if (total <= 0) {
+        return null;
+      }
       let cursor = Math.floor(Math.random() * total);
       for (let index = 0; index < state.prizes.length; index += 1) {
         const prize = state.prizes[index];
@@ -739,7 +833,12 @@
 
       window.setTimeout(() => {
         const item = state.prizes[index];
-        item.count -= 1;
+        if (!item) {
+          spinning = false;
+          render();
+          return;
+        }
+        item.count = Math.max(0, item.count - 1);
         state.history.unshift({
           name: prizeName,
           time: new Date().toISOString()
@@ -751,6 +850,72 @@
         render();
       }, 4300);
     }
+
+    function refreshLotterySurface() {
+      const left = totalLeft();
+      totalLeftEl.textContent = left;
+      drawBtn.disabled = spinning || left <= 0;
+      drawBtn.textContent = spinning ? "抽奖中" : left > 0 ? "开始抽奖" : "奖池已空";
+      drawWheel();
+    }
+
+    prizesEl.addEventListener("input", (event) => {
+      if (spinning) {
+        return;
+      }
+
+      const row = event.target.closest(".prize-edit");
+      if (!row) {
+        return;
+      }
+
+      const index = Number(row.dataset.index);
+      const prize = state.prizes[index];
+      if (!prize) {
+        return;
+      }
+
+      if (event.target.dataset.field === "name") {
+        prize.name = event.target.value;
+      }
+
+      if (event.target.dataset.field === "count") {
+        prize.count = Math.max(0, Math.floor(Number(event.target.value) || 0));
+      }
+
+      saveState();
+      refreshLotterySurface();
+    });
+
+    prizesEl.addEventListener("click", (event) => {
+      if (spinning || event.target.dataset.action !== "remove") {
+        return;
+      }
+
+      const row = event.target.closest(".prize-edit");
+      if (!row) {
+        return;
+      }
+
+      const index = Number(row.dataset.index);
+      state.prizes.splice(index, 1);
+      saveState();
+      render();
+    });
+
+    addPrizeBtn.addEventListener("click", () => {
+      if (spinning) {
+        return;
+      }
+
+      state.prizes.push({
+        id: nextPrizeId(),
+        name: `新奖品${state.prizes.length + 1}`,
+        count: 1
+      });
+      saveState();
+      render();
+    });
 
     drawBtn.addEventListener("click", () => {
       if (spinning || totalLeft() <= 0) {
