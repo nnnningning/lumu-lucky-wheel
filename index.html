@@ -30,90 +30,13 @@
       min-height: 100%;
       font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
       color: var(--ink);
-      background:
-        radial-gradient(circle at 12% 16%, rgba(255, 204, 213, 0.48), transparent 28%),
-        radial-gradient(circle at 88% 20%, rgba(173, 227, 255, 0.58), transparent 30%),
-        linear-gradient(180deg, #ade3ff 0%, #c4ddf3 36%, #d6d8ea 54%, #ffccd5 100%);
+      background: linear-gradient(180deg, #ade3ff 0%, #c4ddf3 36%, #d6d8ea 54%, #ffccd5 100%);
     }
 
     body {
       display: grid;
       place-items: center;
       padding: 28px;
-    }
-
-    .page-decor {
-      display: block;
-      position: absolute;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-      filter: drop-shadow(0 14px 18px rgba(75, 117, 150, 0.15));
-    }
-
-    .hero-art {
-      position: relative;
-      flex: 0 0 clamp(168px, 20vw, 238px);
-      height: clamp(112px, 12vw, 154px);
-      margin: -6px 2px -8px;
-    }
-
-    .hero-boy {
-      width: clamp(92px, 10vw, 132px);
-      left: 0;
-      top: 18px;
-      transform: rotate(-7deg);
-      z-index: 2;
-    }
-
-    .hero-girl {
-      width: clamp(88px, 9.5vw, 126px);
-      right: 0;
-      top: 0;
-      transform: rotate(7deg);
-      z-index: 3;
-    }
-
-    .hero-bow {
-      width: clamp(48px, 5vw, 74px);
-      left: 48%;
-      bottom: 0;
-      opacity: 0.86;
-      transform: translateX(-50%) rotate(5deg);
-      z-index: 1;
-    }
-
-    .wheel-name-stars {
-      width: clamp(50px, 5vw, 78px);
-      left: clamp(4px, 3vw, 32px);
-      top: clamp(12px, 4vw, 42px);
-      opacity: 0.86;
-      transform: rotate(-8deg);
-    }
-
-    .wheel-sparkles {
-      width: clamp(26px, 3vw, 42px);
-      right: clamp(14px, 4vw, 58px);
-      top: 18%;
-      opacity: 0.74;
-      transform: rotate(5deg);
-    }
-
-    .wheel-soft-star {
-      width: clamp(44px, 5vw, 72px);
-      right: clamp(10px, 3vw, 44px);
-      bottom: 12%;
-      opacity: 0.64;
-      transform: rotate(-10deg);
-    }
-
-    .side-heart-card {
-      width: clamp(58px, 6vw, 86px);
-      top: 16px;
-      right: 18px;
-      opacity: 0.68;
-      transform: rotate(10deg);
-      z-index: 0;
     }
 
     .app {
@@ -134,12 +57,6 @@
       backdrop-filter: blur(18px);
       position: relative;
       overflow: hidden;
-    }
-
-    .stage > :not(.page-decor),
-    .side > :not(.page-decor) {
-      position: relative;
-      z-index: 1;
     }
 
     .stage {
@@ -175,7 +92,7 @@
       display: flex;
       justify-content: space-between;
       gap: 18px;
-      align-items: center;
+      align-items: flex-start;
     }
 
     .title-block {
@@ -227,10 +144,6 @@
       place-items: center;
       min-height: 420px;
       overflow: visible;
-    }
-
-    .wheel-zone .page-decor {
-      z-index: 0;
     }
 
     .wheel-wrap {
@@ -578,57 +491,6 @@
         align-items: stretch;
       }
 
-      .hero-art {
-        width: min(72vw, 250px);
-        height: 132px;
-        flex: 0 0 auto;
-        align-self: center;
-        margin: -4px auto 0;
-      }
-
-      .hero-boy {
-        width: 112px;
-        left: 20px;
-        top: 18px;
-      }
-
-      .hero-girl {
-        width: 108px;
-        right: 18px;
-      }
-
-      .hero-bow {
-        width: 58px;
-      }
-
-      .wheel-name-stars {
-        width: 50px;
-        left: -2px;
-        top: 18px;
-        opacity: 0.72;
-      }
-
-      .wheel-sparkles {
-        width: 28px;
-        right: 8px;
-        top: 20%;
-        opacity: 0.62;
-      }
-
-      .wheel-soft-star {
-        width: 50px;
-        right: 4px;
-        bottom: 8%;
-        opacity: 0.52;
-      }
-
-      .side-heart-card {
-        width: 66px;
-        top: 10px;
-        right: 12px;
-        opacity: 0.48;
-      }
-
       .counter {
         width: 100%;
         display: flex;
@@ -662,21 +524,6 @@
         padding: 16px;
       }
 
-      .hero-art {
-        width: min(78vw, 226px);
-        height: 118px;
-      }
-
-      .hero-boy {
-        width: 98px;
-        left: 16px;
-      }
-
-      .hero-girl {
-        width: 94px;
-        right: 14px;
-      }
-
       .wheel-wrap {
         width: min(88vw, 360px);
       }
@@ -700,11 +547,6 @@
           <h1 id="title">橹穆常相见</h1>
           <p>lmp专用</p>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <img class="page-decor hero-boy" src="assets/decor-star-boy.png" alt="">
-          <img class="page-decor hero-girl" src="assets/decor-wand-girl.png" alt="">
-          <img class="page-decor hero-bow" src="assets/decor-bow.png" alt="">
-        </div>
         <div class="counter" aria-live="polite">
           <span>剩余奖品</span>
           <strong id="totalLeft">106</strong>
@@ -712,9 +554,6 @@
       </header>
 
       <div class="wheel-zone">
-        <img class="page-decor wheel-name-stars" src="assets/decor-name-stars.png" alt="" aria-hidden="true">
-        <img class="page-decor wheel-sparkles" src="assets/decor-sparkles.png" alt="" aria-hidden="true">
-        <img class="page-decor wheel-soft-star" src="assets/decor-soft-star.png" alt="" aria-hidden="true">
         <div class="wheel-wrap">
           <div class="pin" aria-hidden="true"></div>
           <canvas id="wheel" width="960" height="960" aria-label="抽奖转盘"></canvas>
@@ -735,7 +574,6 @@
     </section>
 
     <aside class="side">
-      <img class="page-decor side-heart-card" src="assets/decor-heart-card.png" alt="" aria-hidden="true">
       <section class="history">
         <div class="history-head">
           <h2>中奖记录</h2>
